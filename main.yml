@@ -1,11 +1,6 @@
 ---
-- name: Install Zabbix Agent
+- name: Zabbix Agent Installation
   hosts: local
-  remote_user: root
-  # remote_user: user
-  # become: yes
-  # become_method: sudo
-
   roles:
     - zabbix
-
+  tags: test

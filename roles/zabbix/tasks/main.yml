@@ -1,16 +1,4 @@
 ---
-    - name: Display all variables/facts known for a host
-      debug:
-        hostvars[inventory_hostname]
-
-    - debug:
-       msg: "System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}\nserver_url: {{ zabbix_url }}
-        login_user: {{ zabbix_user }}
-        login_password: {{ zabbix_password }}
-        host_name: {{inventory_hostname}}
-        host_groups: {{ zabbix_groups }}
-            ip: {{ ansible_default_ipv4.address }}"
-
     - name: Download Zabbix deb where Ubuntu 14.04
       get_url:
         url: http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+trusty_all.deb
