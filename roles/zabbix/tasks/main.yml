@@ -1,20 +1,20 @@
 ---
-    - name: Download file from a file path
+    - name: Download Zabbix deb
       get_url:
         url: http://repo.zabbix.com/zabbix/3.0/debian/pool/main/z/zabbix-release/zabbix-release_3.0-1+jessie_all.deb
         dest: /zabbix.deb
 
-    - name: Install my_package
+    - name: Install Zabbix deb
       apt: deb="/zabbix.deb"
       sudo: true
 
-    - name: updates a server
+    - name: Update server
       apt: update_cache=yes
       
-    - name: upgrade a server
+    - name: Upgrade server
       apt: upgrade=dist
 
-    - name: Installs Zabbix
+    - name: Installs Zabbix Agent
       apt: pkg=zabbix-agent state=installed update_cache=true
       notify:
         - start zabbix-agent
