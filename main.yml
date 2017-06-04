@@ -3,4 +3,10 @@
   hosts: local
   roles:
     - zabbix
-  tags: test
+  tags: deploy-zabbix
+
+- name: Default Server Tasks
+  hosts: local
+  roles:
+    - default-tasks
+  tags: default-tasks
