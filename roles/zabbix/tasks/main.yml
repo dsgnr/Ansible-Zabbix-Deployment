@@ -10,7 +10,7 @@
 
     - name: Update server
       apt: update_cache=yes
-      
+
     - name: Upgrade server
       apt: upgrade=dist
 
@@ -18,6 +18,10 @@
       apt: pkg=zabbix-agent state=installed update_cache=true
       notify:
         - start zabbix-agent
+
+    - name: Copy Zabbix configuration files
+      template: src=zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf
+      notify: restart zabbix-agent
 
 #  handlers:
 #    - name: start zabbix
