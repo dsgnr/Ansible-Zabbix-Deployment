@@ -21,6 +21,9 @@
 
     - name: Copy Zabbix configuration files
       template: src=zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf
+
+    - name: Copy Zabbix PSK file
+      template: src=zabbix_agentd.psk dest=/etc/zabbix/zabbix_agentd.psk
       notify: restart zabbix-agent
 
 #  handlers:
