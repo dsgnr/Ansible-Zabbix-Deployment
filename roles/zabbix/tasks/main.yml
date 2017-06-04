@@ -1,4 +1,15 @@
 ---
+    - name: Display all variables/facts known for a host
+      debug:
+        hostvars[inventory_hostname]
+
+    - debug:
+       msg: "System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}\nserver_url: {{ zabbix_url }}
+        login_user: {{ zabbix_user }}
+        login_password: {{ zabbix_password }}
+        host_name: {{inventory_hostname}}
+        host_groups: {{ zabbix_groups }}
+            ip: {{ ansible_default_ipv4.address }}"
     - name: Download Zabbix deb
       get_url:
         url: http://repo.zabbix.com/zabbix/3.0/debian/pool/main/z/zabbix-release/zabbix-release_3.0-1+jessie_all.deb
@@ -26,10 +37,21 @@
       template: src=zabbix_agentd.psk dest=/etc/zabbix/zabbix_agentd.psk
       notify: restart zabbix-agent
 
-#  handlers:
-#    - name: start zabbix
-#      service: name=zabbix-agent state=started
-
-
-
-
+    - name: "Create a new host or update an existing host's info"
+      local_action:
+        module: zabbix_host
+        server_url: "{{ zabbix_url }}"
+        login_user: "{{ zabbix_user }}"
+        login_password: "{{ zabbix_password }}"
+        host_name: "{{inventory_hostname}}"
+        host_groups: "{{ zabbix_groups }}"
+        inventory_mode: automatic
+        status: "enabled"
+        state: "present"
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 0
+            ip: "{{ ansible_default_ipv4.address }}"
+            dns: "{{inventory_hostname}}"
+            port: 10050

@@ -1,0 +1,6 @@
+---
+
+zabbix_groups: 'Hypervisors'
+zabbix_url: 'http://zabbix.handsoff.cloud/api_jsonrpc.php'
+zabbix_user: 'danielhand'
+zabbix_password: 'passwordhere'
