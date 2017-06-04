@@ -12,7 +12,7 @@
             ip: {{ ansible_default_ipv4.address }}"
     - name: Download Zabbix deb
       get_url:
-        url: http://repo.zabbix.com/zabbix/3.0/debian/pool/main/z/zabbix-release/zabbix-release_3.0-1+jessie_all.deb
+        url: http://repo.zabbix.com/zabbix/3.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.0-1+xenial_all.deb
         dest: /zabbix.deb
 
     - name: Install Zabbix deb
@@ -27,16 +27,15 @@
 
     - name: Installs Zabbix Agent
       apt: pkg=zabbix-agent state=installed update_cache=true
-      notify:
-        - start zabbix-agent
 
     - name: Copy Zabbix configuration files
       template: src=zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf
 
     - name: Copy Zabbix PSK file
       template: src=zabbix_agentd.psk dest=/etc/zabbix/zabbix_agentd.psk
-      notify: restart zabbix-agent
 
+    - name: always restart Zabbix-agent
+      service: name=zabbix-agent state=restarted
     - name: "Create a new host or update an existing host's info"
       local_action:
         module: zabbix_host
