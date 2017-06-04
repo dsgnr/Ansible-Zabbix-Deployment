@@ -1,0 +1,86 @@
+---
+    - name: Add repositories
+      template: src=dotdeb.list dest=/etc/apt/sources.list.d/dotdeb.list
+
+    - name: Update server
+      apt: update_cache=yes
+
+    - name: Upgrade server
+      apt: upgrade=dist
+
+    - name: Install Nginx
+      apt: pkg=nginx state=installed update_cache=true
+
+    - name: Copy Nginx config
+      template: src=nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: Copy Nginx Site config
+      template: src=nginx-site-config.conf dest=/etc/nginx/sites-available/example.com
+
+    - name: Create Nginx symlink
+      file: src=/etc/nginx/sites-available/example.com dest=/etc/nginx/sites-enabled/example.com state=link
+      notify: nginx reload
+
+    - name: Install PHP 7.0-FPM
+      apt: name={{item}} state=installed
+      with_items:
+        - php7.0-cli 
+        - php7.0-curl 
+        - php7.0-dev 
+        - php7.0-zip 
+        - php7.0-fpm 
+        - php7.0-gd 
+        - php7.0-xml 
+        - php7.0-mysql 
+        - php7.0-mcrypt 
+        - php7.0-mbstring 
+        - php7.0-opcache
+
+    - name: Install MariaDB
+      apt: name={{item}} state=installed
+      with_items:
+        - mariadb-server 
+        - mariadb-client
+
+        - name: Set root Password
+        mysql_user: name=root host={{ item }} password={{ mysql_root_password }} state=present
+        with_items:
+          - localhost
+          - 127.0.0.1
+          - ::1
+
+      - name: Reload privilege tables
+        command: 'mysql -ne "{{ item }}"'
+        with_items:
+          - FLUSH PRIVILEGES
+        changed_when: False
+
+      - name: Add .my.cnf
+        template: src=my.cnf dest=/etc/mysql/my.cnf owner=root group=root mode=0600
+
+      - name: Remove anonymous users
+        command: 'mysql -ne "{{ item }}"'
+        with_items:
+          - DELETE FROM mysql.user WHERE User=''
+        changed_when: False
+
+      - name: Disallow root login remotely
+        command: 'mysql -ne "{{ item }}"'
+        with_items:
+          - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+        changed_when: False
+
+      - name: Remove test database and access to it
+        command: 'mysql -ne "{{ item }}"'
+        with_items:
+          - DROP DATABASE test
+          - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
+        changed_when: False
+        ignore_errors: True
+
+      - name: Reload privilege tables
+        command: 'mysql -ne "{{ item }}"'
+        with_items:
+          - FLUSH PRIVILEGES
+        changed_when: False      
+
