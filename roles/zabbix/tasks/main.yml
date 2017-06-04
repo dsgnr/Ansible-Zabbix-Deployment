@@ -10,10 +10,30 @@
         host_name: {{inventory_hostname}}
         host_groups: {{ zabbix_groups }}
             ip: {{ ansible_default_ipv4.address }}"
-    - name: Download Zabbix deb
+
+    - name: Download Zabbix deb where Ubuntu 14.04
+      get_url:
+        url: http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+trusty_all.deb
+        dest: /zabbix.deb
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+
+    - name: Download Zabbix deb where Ubuntu 16.04
       get_url:
         url: http://repo.zabbix.com/zabbix/3.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.0-1+xenial_all.deb
         dest: /zabbix.deb
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+    - name: Download Zabbix deb where Debian 7
+      get_url:
+        url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+wheezy_all.deb
+        dest: /zabbix.deb
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'wheezy'
+
+    - name: Download Zabbix deb where Debian 8
+      get_url:
+        url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+jessie_all.deb
+        dest: /zabbix.deb
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'jessie'
 
     - name: Install Zabbix deb
       apt: deb="/zabbix.deb"
@@ -34,8 +54,18 @@
     - name: Copy Zabbix PSK file
       template: src=zabbix_agentd.psk dest=/etc/zabbix/zabbix_agentd.psk
 
+    - name: Creates zabbix_agent.d directory
+      file: path=/etc/zabbix/zabbix_agentd.d state=directory
+
+    - name: Copy Zabbix MySQL file
+      template: src=userparameter_mysql.conf dest=/etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
+
+    - name: Copy Zabbix Nginx Config file
+      template: src=userparameter_nginx.conf dest=/etc/zabbix/zabbix_agentd.d/userparameter_nginx.conf
+
     - name: always restart Zabbix-agent
       service: name=zabbix-agent state=restarted
+
     - name: "Create a new host or update an existing host's info"
       local_action:
         module: zabbix_host
