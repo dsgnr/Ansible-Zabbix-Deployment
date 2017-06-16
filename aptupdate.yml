@@ -1,0 +1,6 @@
+---
+- name: Apt Update && Apt Upgrade
+  hosts: local
+  roles:
+    - aptupdate
+
